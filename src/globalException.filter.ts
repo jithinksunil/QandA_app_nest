@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ANSI_COLORS } from './common/constants';
+import { ANSI_COLORS } from './common';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

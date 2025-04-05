@@ -7,12 +7,18 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SigninDTO, SignupDTO } from './dto/auth.dto';
 import { Request, Response } from 'express';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { refreshEndpoint, ROUTE_PREFIXES } from 'src/common';
+import { JwtAuthGuard } from 'src/guards/jwtAuth.guard';
+import { Public } from 'src/guards/public.guard';
+import { Roles, User } from 'src/decorators';
+import { UserRole } from '@prisma/client';
+import { RolesGuard } from 'src/guards';
 @ApiTags('Auth')
 @Controller(ROUTE_PREFIXES.AUTH)
 export class AuthController {
@@ -112,6 +118,9 @@ export class AuthController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.VIEWER)
+  @Post('/signout')
   signout(@Res({ passthrough: true }) res: Response) {
     return this.authService.signout(res);
   }
