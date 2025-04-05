@@ -12,12 +12,12 @@ import { AuthService } from './auth.service';
 import { SigninDTO, SignupDTO } from './dto/auth.dto';
 import { Request, Response } from 'express';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { refreshEndpoint, ROUTE_PREFIXES } from 'src/common/constants';
+import { refreshEndpoint, ROUTE_PREFIXES } from 'src/common';
 @ApiTags('Auth')
 @Controller(ROUTE_PREFIXES.AUTH)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  
+
   @Post('/signup')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -70,7 +70,7 @@ export class AuthController {
   signin(@Body() body: SigninDTO, @Res({ passthrough: true }) res: Response) {
     return this.authService.signin(body, res);
   }
-  
+
   @Get(refreshEndpoint)
   @ApiOperation({
     summary: 'Token refresh end point',

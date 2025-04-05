@@ -14,9 +14,10 @@ import {
   refreshEndpoint,
   ROUTE_PREFIXES,
   serverPrefix,
-} from 'src/common/constants';
+  compareHashedText,
+  hashText,
+} from 'src/common';
 import { UserJWTPayload } from 'src/interfaces';
-import { compareHashedText, hashText } from 'src/common';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +50,7 @@ export class AuthService {
       name: user.name,
       role: user.role,
     });
-    
+
     const { refreshToken, expiresIn: refreshTokenExpiresIn } =
       await this.createRefreshToken({
         email: user.email,
