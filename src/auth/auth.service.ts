@@ -160,7 +160,11 @@ export class AuthService {
     };
   }
 
-  async signout(res: Response) {
+  async signout(userId: string, res: Response) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshTokenHash: null },
+    });
     res.clearCookie('refreshToken', {
       path: `${serverPrefix}${ROUTE_PREFIXES.AUTH}${refreshEndpoint}`,
     });

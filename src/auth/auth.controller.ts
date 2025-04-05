@@ -101,6 +101,8 @@ export class AuthController {
   refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     return this.authService.refresh(req, res);
   }
+
+  @UseGuards(JwtAuthGuard)
   @Post('/signout')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
@@ -118,10 +120,7 @@ export class AuthController {
       },
     },
   })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.VIEWER)
-  @Post('/signout')
-  signout(@Res({ passthrough: true }) res: Response) {
-    return this.authService.signout(res);
+  signout(@User('id') id: string, @Res({ passthrough: true }) res: Response) {
+    return this.authService.signout(id, res);
   }
 }
