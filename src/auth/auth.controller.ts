@@ -109,7 +109,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
-    description: 'Return and json object of a message',
+    description: 'Return nothing ',
     schema: {
       type: 'object',
       properties: {

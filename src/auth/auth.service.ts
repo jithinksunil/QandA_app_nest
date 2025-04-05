@@ -168,7 +168,6 @@ export class AuthService {
     res.clearCookie('refreshToken', {
       path: `${serverPrefix}${ROUTE_PREFIXES.AUTH}${refreshEndpoint}`,
     });
-    return { message: 'Signed out successfully' };
   }
 
   async createAccessToken(payload: UserJWTPayload) {
