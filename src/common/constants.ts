@@ -6,3 +6,12 @@ export enum ANSI_COLORS {
   YELLOW = '\x1b[33m',
   RESET = '\x1b[0m',
 }
+
+export enum ROUTE_PREFIXES {
+  AUTH = '/auth',
+  USER = '/user',
+  DOCUMENT = '/document',
+  CONVERSATION = '/conversation',
+}
+
+export const refreshEndpoint = '/refresh';

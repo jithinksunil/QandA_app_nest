@@ -10,7 +10,11 @@ import { UserRole } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
-import { serverPrefix } from 'src/common/constants';
+import {
+  refreshEndpoint,
+  ROUTE_PREFIXES,
+  serverPrefix,
+} from 'src/common/constants';
 import { UserJWTPayload } from 'src/interfaces';
 import { compareHashedText, hashText } from 'src/common';
 
@@ -62,7 +66,7 @@ export class AuthService {
       secure: true,
       sameSite: 'strict',
       maxAge: refreshTokenExpiresIn,
-      path: `${serverPrefix}/auth/refresh`,
+      path: `${serverPrefix}${ROUTE_PREFIXES.AUTH}${refreshEndpoint}`,
     });
 
     return {
@@ -92,7 +96,7 @@ export class AuthService {
       select: { id: true },
     });
     // We can write logic to send a welcome email here (if required)
-    return { message: 'User created successfully', userId: user.id };
+    return { message: 'User created successfully', id: user.id };
   }
 
   async refresh(req: Request, res: Response) {
@@ -143,7 +147,7 @@ export class AuthService {
       secure: true,
       sameSite: 'strict',
       maxAge: expiresIn,
-      path: `${serverPrefix}/auth/refresh`,
+      path: `${serverPrefix}${ROUTE_PREFIXES.AUTH}${refreshEndpoint}`,
     });
 
     return {
@@ -153,6 +157,13 @@ export class AuthService {
       email: user.email,
       name: user.name,
     };
+  }
+
+  async signout(res: Response) {
+    res.clearCookie('refreshToken', {
+      path: `${serverPrefix}${ROUTE_PREFIXES.AUTH}${refreshEndpoint}`,
+    });
+    return { message: 'Signed out successfully' };
   }
 
   async createAccessToken(payload: UserJWTPayload) {
