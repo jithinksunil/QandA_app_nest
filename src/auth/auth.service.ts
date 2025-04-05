@@ -49,6 +49,7 @@ export class AuthService {
       name: user.name,
       role: user.role,
     });
+    
     const { refreshToken, expiresIn: refreshTokenExpiresIn } =
       await this.createRefreshToken({
         email: user.email,
@@ -68,7 +69,6 @@ export class AuthService {
       maxAge: refreshTokenExpiresIn,
       path: `${serverPrefix}${ROUTE_PREFIXES.AUTH}${refreshEndpoint}`,
     });
-
     return {
       accessToken,
       id: user.id,

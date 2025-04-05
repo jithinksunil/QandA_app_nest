@@ -17,31 +17,7 @@ import { refreshEndpoint, ROUTE_PREFIXES } from 'src/common/constants';
 @Controller(ROUTE_PREFIXES.AUTH)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  @Get('/signin')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Sign in',
-    description: 'End point for Sign in the user',
-  })
-  @ApiBody({ type: SigninDTO })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description:
-      'Return and json object and the refresh token is set as an http only cookie',
-    schema: {
-      type: 'object',
-      properties: {
-        accessToken: { type: 'string' },
-        id: { type: 'string' },
-        name: { type: 'string' },
-        email: { type: 'string' },
-        role: { type: 'string' },
-      },
-    },
-  })
-  signin(@Body() body: SigninDTO, @Res() res: Response) {
-    return this.authService.signin(body, res);
-  }
+  
   @Post('/signup')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -69,6 +45,32 @@ export class AuthController {
     });
   }
 
+  @Post('/signin')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Sign in',
+    description: 'End point for Sign in the user',
+  })
+  @ApiBody({ type: SigninDTO })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      'Return and json object and the refresh token is set as an http only cookie',
+    schema: {
+      type: 'object',
+      properties: {
+        accessToken: { type: 'string' },
+        id: { type: 'string' },
+        name: { type: 'string' },
+        email: { type: 'string' },
+        role: { type: 'string' },
+      },
+    },
+  })
+  signin(@Body() body: SigninDTO, @Res({ passthrough: true }) res: Response) {
+    return this.authService.signin(body, res);
+  }
+  
   @Get(refreshEndpoint)
   @ApiOperation({
     summary: 'Token refresh end point',
@@ -90,7 +92,7 @@ export class AuthController {
       },
     },
   })
-  refresh(@Req() req: Request, @Res() res: Response) {
+  refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     return this.authService.refresh(req, res);
   }
   @Post('/signout')
@@ -110,7 +112,7 @@ export class AuthController {
       },
     },
   })
-  signout(res: Response) {
+  signout(@Res({ passthrough: true }) res: Response) {
     return this.authService.signout(res);
   }
 }
