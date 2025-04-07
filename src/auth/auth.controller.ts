@@ -16,6 +16,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { refreshEndpoint, ROUTE_PREFIXES } from 'src/common';
 import { JwtAuthGuard } from 'src/guards/jwtAuth.guard';
 import { User } from 'src/decorators';
+import { UserRole } from '@prisma/client';
 @ApiTags('Auth')
 @Controller(ROUTE_PREFIXES.AUTH)
 export class AuthController {
@@ -66,7 +67,7 @@ export class AuthController {
         id: { type: 'string' },
         name: { type: 'string' },
         email: { type: 'string' },
-        role: { type: 'string' },
+        role: { type: 'string', enum: Object.values(UserRole) },
       },
     },
   })
@@ -91,7 +92,7 @@ export class AuthController {
         id: { type: 'string' },
         name: { type: 'string' },
         email: { type: 'string' },
-        role: { type: 'string' },
+        role: { type: 'string', enum: Object.values(UserRole) },
       },
     },
   })
