@@ -1,11 +1,11 @@
 # Use the official Node.js 20.9.0 image as a base
 FROM node:20.9.0-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package.json yarn.lock ./
 
-RUN yarn install
+RUN yarn
 
 # Copy the rest of the application code
 COPY . .
