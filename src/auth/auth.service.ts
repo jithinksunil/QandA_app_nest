@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { SigninDTO, SignupDTO } from './dto/auth.dto';
@@ -61,7 +62,7 @@ export class AuthService {
     const refreshTokenHash = await hashText(refreshToken);
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { refreshTokenHash },
+      data: { refreshTokenHash, lastLogin: new Date() },
     });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -116,6 +117,7 @@ export class AuthService {
         name: true,
       },
     });
+    if (!user) throw new NotFoundException('User not found');
     if (user.role !== payload.role)
       throw new UnauthorizedException(
         'Your permissions has been changed, please sign in again',
