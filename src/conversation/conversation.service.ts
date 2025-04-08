@@ -1,9 +1,12 @@
+import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjestionStatus } from '@prisma/client';
+import { firstValueFrom } from 'rxjs';
 import {
   ResponseChatEntryStructure,
   ResponseDocumentStructure,
@@ -12,7 +15,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ConversationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly httpService: HttpService,
+    private readonly config: ConfigService,
+  ) {}
 
   async getConversation({
     documentId,
@@ -126,11 +133,24 @@ export class ConversationService {
         },
       });
     }
-
+    const {
+      data: { answer },
+    } = await firstValueFrom(
+      this.httpService.post(
+        `${this.config.get('PYTHON_BACKEND_BASE_URL')!}/conversation/document/${documentId}/ask-question`,
+        { question },
+        {
+          auth: {
+            password: this.config.get('SERVER_SHARED_PASSWORD')!,
+            username: this.config.get('SERVER_SHARED_USERNAME')!,
+          },
+        },
+      ),
+    );
     const chatEntry = await this.prisma.chatEntry.create({
       data: {
         question,
-        answer: 'Answer',
+        answer,
         conversationId: document.conversation!.id,
       },
       select: {

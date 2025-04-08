@@ -3,23 +3,29 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjestionStatus, UserRole } from '@prisma/client';
 import { Response } from 'express';
-import { firstValueFrom } from 'rxjs';
+import { first, firstValueFrom } from 'rxjs';
 import { AwsService } from 'src/aws/aws.service';
-import { getFileExtension } from 'src/common';
+import { ANSI_COLORS, getFileExtension } from 'src/common';
 import { ResponseDocumentStructure } from 'src/interfaces';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DocumentService {
+  private logger: Logger;
   constructor(
     private readonly prisma: PrismaService,
     private readonly awsService: AwsService,
     private readonly httpService: HttpService,
-  ) {}
+    private readonly config: ConfigService,
+  ) {
+    this.logger = new Logger(DocumentService.name);
+  }
   async listAllDocuments(): Promise<ResponseDocumentStructure[]> {
     const documents = await this.prisma.document.findMany({
       select: {
@@ -41,7 +47,9 @@ export class DocumentService {
     return modifiedData;
   }
 
-  async viewUploadedDocuments(userId: string): Promise<ResponseDocumentStructure[]> {
+  async viewUploadedDocuments(
+    userId: string,
+  ): Promise<ResponseDocumentStructure[]> {
     const documents = await this.prisma.document.findMany({
       where: { userId },
       select: {
@@ -84,7 +92,25 @@ export class DocumentService {
         },
         select: { id: true },
       });
-      ///////////////////////////////////////////////////Handle push to que to to process background job by python which is listening to queue
+      //Background job to start injestion in python. After injestion is completed, python should update the db with injestion status COMPLETED, content and the embedding...
+      this.httpService
+        .post(
+          `${this.config.get('PYTHON_BACKEND_BASE_URL')!}/injestion/start`,
+          { documentId: document.id },
+          {
+            auth: {
+              password: this.config.get('SERVER_SHARED_PASSWORD')!,
+              username: this.config.get('SERVER_SHARED_USERNAME')!,
+            },
+          },
+        )
+        .subscribe({
+          error: (err) =>
+            this.logger.error(
+              err,
+              `${ANSI_COLORS.RED}${err?.stack}${ANSI_COLORS.RESET}`,
+            ),
+        });
       return {
         id: document.id,
         injestionStatus: InjestionStatus.PENDING,
@@ -157,9 +183,8 @@ export class DocumentService {
 
     await this.prisma.$transaction(async (tx) => {
       await tx.document.delete({ where: { id } });
-      const x=await this.awsService.deleteFile(document.s3BucketKey);
+      const x = await this.awsService.deleteFile(document.s3BucketKey);
       console.log(x);
-      
     });
     return { message: 'Deleted successfully' };
   }
