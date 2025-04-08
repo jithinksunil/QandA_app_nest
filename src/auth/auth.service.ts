@@ -39,12 +39,12 @@ export class AuthService {
         email: true,
       },
     });
-    if (!user) throw new UnauthorizedException('User not found');
+    if (!user) throw new NotFoundException('User not found');
     const isPasswordValid = await compareHashedText(
       password,
       user.passwordHash,
     );
-    if (!isPasswordValid) throw new UnauthorizedException('Invalid password');
+    if (!isPasswordValid) throw new BadRequestException('Invalid password');
     const { accessToken } = await this.createAccessToken({
       email: user.email,
       id: user.id,
@@ -167,7 +167,7 @@ export class AuthService {
     };
   }
 
-  async signout({res,userId}:{userId: string, res: Response}) {
+  async signout({ res, userId }: { userId: string; res: Response }) {
     await this.prisma.user.update({
       where: { id: userId },
       data: { refreshTokenHash: null },
