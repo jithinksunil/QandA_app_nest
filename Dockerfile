@@ -10,7 +10,7 @@ RUN yarn
 # Copy the rest of the application code
 COPY . .
 
-RUN yarn prisma migrate dev
+RUN yarn prisma generate
 
 # Build the NestJS application
 RUN yarn build
