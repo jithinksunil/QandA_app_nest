@@ -8,15 +8,23 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
-import { ROUTE_PREFIXES } from 'src/common';
+import { ROUTE_PREFIXES, swaggerAccessTokenName } from 'src/common';
 import { Roles, User } from 'src/decorators';
 import { JwtAuthGuard, RolesGuard } from 'src/guards';
 import { UserService } from './user.service';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { RenameUserDTO, UpdateUserDTO } from './dto/user.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller(ROUTE_PREFIXES.USER)
+@ApiTags('User')
+@ApiBearerAuth(swaggerAccessTokenName)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
