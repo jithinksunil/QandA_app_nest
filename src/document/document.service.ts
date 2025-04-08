@@ -10,7 +10,7 @@ import { Response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { AwsService } from 'src/aws/aws.service';
 import { getFileExtension } from 'src/common';
-import { OutputDocument } from 'src/interfaces';
+import { ResponseDocumentStructure } from 'src/interfaces';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class DocumentService {
     private readonly awsService: AwsService,
     private readonly httpService: HttpService,
   ) {}
-  async listAllDocuments(): Promise<OutputDocument[]> {
+  async listAllDocuments(): Promise<ResponseDocumentStructure[]> {
     const documents = await this.prisma.document.findMany({
       select: {
         id: true,
@@ -41,7 +41,7 @@ export class DocumentService {
     return modifiedData;
   }
 
-  async viewUploadedDocuments(userId: string): Promise<OutputDocument[]> {
+  async viewUploadedDocuments(userId: string): Promise<ResponseDocumentStructure[]> {
     const documents = await this.prisma.document.findMany({
       where: { userId },
       select: {

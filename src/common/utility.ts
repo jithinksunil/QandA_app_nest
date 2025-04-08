@@ -12,5 +12,5 @@ export const compareHashedText = async (
 };
 export const getFileExtension = (filename: string): string => {
   const parts = filename.split('.');
-  return parts.length > 1 ? parts.pop().toLowerCase() : filename;
-}
+  return parts.length > 1 ? parts.pop()?.toLowerCase() || filename : filename;
+};
