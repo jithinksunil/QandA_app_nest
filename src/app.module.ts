@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/primsa.module';
 import { DocumentModule } from './document/document.module';
 import { GlobalHttpModule } from './global-http/global-http.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { GlobalHttpModule } from './global-http/global-http.module';
     AuthModule,
     DocumentModule,
     GlobalHttpModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
