@@ -12,8 +12,8 @@ import {
 import { AuthService } from './auth.service';
 import { SigninDTO, SignupDTO } from './dto/auth.dto';
 import { Request, Response } from 'express';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { refreshEndpoint, ROUTE_PREFIXES } from 'src/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { refreshEndpoint, ROUTE_PREFIXES, swaggerAccessTokenName } from 'src/common';
 import { JwtAuthGuard } from 'src/guards/jwtAuth.guard';
 import { User } from 'src/decorators';
 import { UserRole } from '@prisma/client';
@@ -106,6 +106,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('/signout')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth(swaggerAccessTokenName)
   @ApiOperation({
     summary: 'Sign out',
     description:

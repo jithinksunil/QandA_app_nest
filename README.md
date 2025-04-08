@@ -30,6 +30,10 @@ yarn start:prod
 
 docker build -t app:1 .
 
-<!-- Run container -->
+<!-- Run container locally-->
 
 docker run --env-file .env -p 8000:8000 app:1
+
+<!-- Production -->
+<!-- Apply database migrations before deploy-->
+yarn prisma migrate deploy
