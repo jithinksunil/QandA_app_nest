@@ -54,7 +54,10 @@ export class ConversationService {
     const modifiedData = {
       ...conversation,
       document: {
-        ...conversation.document,
+        id: conversation.document.id,
+        fileName: conversation.document.fileName,
+        s3BucketKey: conversation.document.s3BucketKey,
+        s3BucketLocation: conversation.document.s3BucketLocation,
         authorId: conversation.document.user.id,
         authorName: conversation.document.user.name,
       },
@@ -127,7 +130,7 @@ export class ConversationService {
     const chatEntry = await this.prisma.chatEntry.create({
       data: {
         question,
-        answer: '',
+        answer: 'Answer',
         conversationId: document.conversation!.id,
       },
       select: {
