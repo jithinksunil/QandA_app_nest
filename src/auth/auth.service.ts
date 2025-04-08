@@ -101,8 +101,13 @@ export class AuthService {
     return { message: 'User created successfully', id: user.id };
   }
 
-  async refresh(req: Request, res: Response) {
-    const refreshToken = req.cookies.refreshToken;
+  async refresh({
+    refreshToken,
+    res,
+  }: {
+    refreshToken: string | undefined;
+    res: Response;
+  }) {
     if (!refreshToken)
       throw new UnauthorizedException('No refresh token found');
     const payload = await this.verifyRefreshToken(refreshToken);
@@ -162,7 +167,7 @@ export class AuthService {
     };
   }
 
-  async signout(userId: string, res: Response) {
+  async signout({res,userId}:{userId: string, res: Response}) {
     await this.prisma.user.update({
       where: { id: userId },
       data: { refreshTokenHash: null },

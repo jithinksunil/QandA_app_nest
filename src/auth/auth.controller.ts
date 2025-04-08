@@ -97,7 +97,10 @@ export class AuthController {
     },
   })
   refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    return this.authService.refresh(req, res);
+    return this.authService.refresh({
+      refreshToken: req.cookies.refreshToken,
+      res,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -119,6 +122,6 @@ export class AuthController {
     },
   })
   signout(@User('id') id: string, @Res({ passthrough: true }) res: Response) {
-    return this.authService.signout(id, res);
+    return this.authService.signout({ userId: id, res });
   }
 }
