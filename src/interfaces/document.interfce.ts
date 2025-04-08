@@ -1,4 +1,4 @@
-export interface OutputDocument {
+export interface ResponseDocumentStructure {
   id: string;
   fileName: string;
   s3BucketKey: string;

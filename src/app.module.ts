@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/primsa.module';
 import { DocumentModule } from './document/document.module';
 import { GlobalHttpModule } from './global-http/global-http.module';
 import { UserModule } from './user/user.module';
+import { ConversationModule } from './conversation/conversation.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UserModule } from './user/user.module';
     DocumentModule,
     GlobalHttpModule,
     UserModule,
+    ConversationModule
   ],
   controllers: [AppController],
   providers: [AppService],
