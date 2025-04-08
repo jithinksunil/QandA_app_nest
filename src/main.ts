@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './globalException.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { serverPrefix } from './common';
+import { serverPrefix, swaggerAccessTokenName } from './common';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -15,10 +15,20 @@ async function bootstrap() {
     origin: process.env.FRONTEND_URL,
   });
   const config = new DocumentBuilder()
-  .setTitle('Rag-Q&A API')
-  .setDescription('Api for users and document management')
-  .setVersion('1.0')
-  .build();
+    .setTitle('Rag-Q&A API')
+    .setDescription('Api for users and document management')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      swaggerAccessTokenName,
+    )
+    .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, documentFactory);
   app.use(cookieParser());
