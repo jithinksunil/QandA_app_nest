@@ -19,6 +19,12 @@ enum UserRole {
   VIEWER
 }
 
+enum InjestionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
 model User {
   id               String         @id @unique @default(uuid())
   name             String
@@ -37,17 +43,18 @@ model User {
 }
 
 model Document {
-  id               String         @id @unique @default(uuid())
+  id               String          @id @unique @default(uuid())
   fileName         String
-  content          String
-  s3BucketFilePath String
-  s3BucketFileKey  String
-  contentEmbedding Bytes
+  s3BucketLocation String
+  s3BucketKey      String
+  content          String?
+  contentEmbedding Bytes?
+  injestionStatus  InjestionStatus @default(PENDING)
   userId           String
-  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   conversations    Conversation[]
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   @@map("documents")
 }

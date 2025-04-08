@@ -10,3 +10,7 @@ export const compareHashedText = async (
 ) => {
   return await bcrypt.compare(text, hash!);
 };
+export const getFileExtension = (filename: string): string => {
+  const parts = filename.split('.');
+  return parts.length > 1 ? parts.pop().toLowerCase() : filename;
+}
