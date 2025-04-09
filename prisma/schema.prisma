@@ -20,6 +20,7 @@ enum UserRole {
 }
 
 enum InjestionStatus {
+  NOT_STARTED
   PENDING
   COMPLETED
   FAILED
@@ -49,7 +50,7 @@ model Document {
   s3BucketKey      String
   content          String?
   contentEmbedding Bytes?
-  injestionStatus  InjestionStatus @default(PENDING)
+  injestionStatus  InjestionStatus @default(NOT_STARTED)
   userId           String
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   conversation     Conversation?

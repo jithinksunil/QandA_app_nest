@@ -196,4 +196,62 @@ export class DocumentController {
       fileName: body.fileName,
     });
   }
+
+  @Post('/:id/start-injestion')
+  @ApiOperation({
+    summary: 'Start Injestion',
+    description: 'Endpoint for starting the injestion process of a document.',
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID of the document' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      'Return a json object including message, status and id of document',
+    schema: {
+      type: 'object',
+      properties: {
+        injestionStatus: {
+          type: 'string',
+          enum: Object.values(InjestionStatus),
+        },
+        message: { type: 'string' },
+        id: { type: 'string' },
+      },
+    },
+  })
+  startInjestion(
+    @Param('id') id: string,
+    @User('id') userId: string,
+    @User('role') role: UserRole,
+  ) {
+    return this.documentService.startInjestion({ id, role, userId });
+  }
+
+  @Get('/:id/check-injestion-status')
+  @ApiOperation({
+    summary: 'Check Injestion Status',
+    description: 'Endpoint for checking the injestion status of a document.',
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID of the document' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Return a json object including status and id of document',
+    schema: {
+      type: 'object',
+      properties: {
+        injestionStatus: {
+          type: 'string',
+          enum: Object.values(InjestionStatus),
+        },
+        id: { type: 'string' },
+      },
+    },
+  })
+  checkInjestionStatus(
+    @Param('id') id: string,
+    @User('id') userId: string,
+    @User('role') role: UserRole,
+  ) {
+    return this.documentService.checkInjestionStatus({ id, role, userId });
+  }
 }
