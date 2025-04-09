@@ -92,28 +92,10 @@ export class DocumentService {
         },
         select: { id: true },
       });
-      //Background job to start injestion in python. After injestion is completed, python should update the db with injestion status COMPLETED, content and the embedding...
-      this.httpService
-        .post(
-          `${this.config.get('PYTHON_BACKEND_BASE_URL')!}/injestion/start`,
-          { documentId: document.id },
-          {
-            auth: {
-              password: this.config.get('SERVER_SHARED_PASSWORD')!,
-              username: this.config.get('SERVER_SHARED_USERNAME')!,
-            },
-          },
-        )
-        .subscribe({
-          error: (err) =>
-            this.logger.error(
-              err,
-              `${ANSI_COLORS.RED}${err?.stack}${ANSI_COLORS.RESET}`,
-            ),
-        });
+
       return {
         id: document.id,
-        injestionStatus: InjestionStatus.PENDING,
+        injestionStatus: InjestionStatus.NOT_STARTED,
         message: 'Document uploaded successfully',
       };
     } catch (error) {
@@ -216,5 +198,62 @@ export class DocumentService {
       data: { fileName: `${fileName}.${extension}` },
     });
     return { message: 'Renamed successfully' };
+  }
+
+  async startInjestion({
+    id,
+    userId,
+    role,
+  }: {
+    id: string;
+    userId: string;
+    role: UserRole;
+  }) {
+    const document = await this.prisma.document.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    if (!document) throw new NotFoundException('Document not found');
+    if (role == UserRole.VIEWER && document.userId !== userId)
+      throw new ForbiddenException(
+        'You are not allowed to start injestion process for this document',
+      );
+    const {
+      data: { injestionStatus },
+    } = await firstValueFrom(
+      this.httpService.post(
+        `${this.config.get('PYTHON_BACKEND_BASE_URL')!}/injestion/start`,
+        { documentId: id },
+        {
+          auth: {
+            password: this.config.get('SERVER_SHARED_PASSWORD')!,
+            username: this.config.get('SERVER_SHARED_USERNAME')!,
+          },
+        },
+      ),
+    );
+    return { injestionStatus, message: 'Injestion process started', id };
+  }
+
+  async checkInjestionStatus({
+    id,
+    userId,
+    role,
+  }: {
+    id: string;
+    userId: string;
+    role: UserRole;
+  }) {
+    const document = await this.prisma.document.findUnique({
+      where: { id },
+      select: { injestionStatus: true, userId: true },
+    });
+    if (!document) throw new NotFoundException('Document not found');
+    if (!document) throw new NotFoundException('Document not found');
+    if (role == UserRole.VIEWER && document.userId !== userId)
+      throw new ForbiddenException(
+        'You are not allowed to start injestion process for this document',
+      );
+    return { injestionStatus: document.injestionStatus, id };
   }
 }
